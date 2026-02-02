@@ -14,10 +14,27 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
+  id       Int      @id @unique @default(autoincrement())
   jobTitle String
   name     String
-  posts    Post[]
+  posts    Post[] //one-to-many
+  address  Address?
+  role RoleLedger? // many-to-many
+}
+
+model RoleLedger {
+  id Int @id @unique @default(autoincrement())
+  userId Int
+  roleId Int
+  User @relation(fields:[userId], references:[id], onDelete: Cascade)
+  Role @relation(fields: [roleId], references:[id])
+}
+
+model Role {
+  id Int @id @unique @default(autoincrement())
+  title String
+  description String
+  role RoleLedger? // many-to-many
 }
 
 model Post {
@@ -26,4 +43,13 @@ model Post {
   published Boolean @default(true)
   authorId  Int
   author    User    @relation(fields: [authorId], references: [id])
+}
+
+model Address {
+  id       Int    @id @default(autoincrement())
+  street   String
+  landmark String?
+  pincode  String
+  userId   Int    @unique
+  name     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
